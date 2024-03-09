@@ -8,5 +8,5 @@ Run -
 <ol>
     <li>pip install -r requirements.txt</li>
     <li>.venv\Scripts\activate</li>
-    <li>python app.py</li>
+    <li>pymon app.py</li>
 </ol>

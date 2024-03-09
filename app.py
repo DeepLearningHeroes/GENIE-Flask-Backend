@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, redirect
 from flask_restful import Resource, Api
 from flask_cors import CORS
 
@@ -6,7 +6,10 @@ app = Flask(__name__)
 cors = CORS(app, resources={r"*": {"origins": "*"}})
 api = Api(app)
 
-class Test(Resource):
+from admin.ResumeHandler import save_resume
+SaveResumeToDatabaseInstance = save_resume.SaveResumeToDatabase
+
+class Home(Resource):
     def get(self):
         return 'Welcome to, Test App API!'
 
@@ -22,7 +25,8 @@ class Test(Resource):
             return {'error': error}
         
 
-api.add_resource(Test,'/')
+api.add_resource(Home,'/')
+api.add_resource(SaveResumeToDatabaseInstance,'/admin/save_resume_to_database')
 
 if __name__ == "__main__":
     port = int(5000)
