@@ -1,10 +1,11 @@
 # GENIE-Flask-Backend
 
-### To create a new requirements.txt file - 
-Run - pip freeze > requirements.txt 
+### To create a new requirements.txt file - ```pip freeze > requirements.txt``` 
 
 ### To setup locally - 
 Run - 
-pip install -r requirements.txt
-.venv\Scripts\activate
-flask --app hello run
+<ol>
+    <li>pip install -r requirements.txt</li>
+    <li>.venv\Scripts\activate</li>
+    <li>flask --app hello run</li>
+</ol>
