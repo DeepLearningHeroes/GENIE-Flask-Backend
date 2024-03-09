@@ -17,7 +17,7 @@ class Home(Resource):
         try:
             value = request.get_json()
             if(value):
-                return {'Post Values': value}, 201
+                return "Data received", 201
 
             return {"error":"Invalid format."}
 
