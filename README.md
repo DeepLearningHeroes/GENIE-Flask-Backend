@@ -8,5 +8,5 @@ Run -
 <ol>
     <li>pip install -r requirements.txt</li>
     <li>.venv\Scripts\activate</li>
-    <li>flask --app hello run</li>
+    <li>python app.py</li>
 </ol>
