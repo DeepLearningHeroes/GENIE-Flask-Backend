@@ -1,6 +1,7 @@
 # GENIE-Flask-Backend
 
-### To create a new requirements.txt file - ```pip freeze > requirements.txt``` 
+### To create a new requirements.txt file - 
+```pip freeze > requirements.txt``` 
 
 ### To setup locally - 
 Run - 
