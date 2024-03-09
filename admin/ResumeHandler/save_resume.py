@@ -10,8 +10,23 @@ class SaveResumeToDatabase(Resource):
     
     def handle_user_data(self,first_name,last_name,resume_text,keywords):
         try:
-            # make an api call here to create user document in mongodb collection
+            # make an api call here to nodejs backend to create user document in mongodb collection
             return {"data":"User data saved to database.","user_id":"user's id from the database"}
+        except Exception as error:
+            return {'error':error}
+        
+    def get_jobs_from_internet(self,keywords):
+        try:
+            job = {
+            "job_id":99141411321,
+            "job_portal":'internshala',
+            "job_link":'url',
+            "job_description":'jdakopskjdks',
+            "job_keywords_ordered":['ruby','js'],
+            "job_posted":'date'
+            }
+            return [job]
+    
         except Exception as error:
             return {'error':error}
 
@@ -24,10 +39,13 @@ class SaveResumeToDatabase(Resource):
             if(value):
                 keywords = self.parse_resume_text(resume_text)
                 response = self.handle_user_data(first_name,last_name,resume_text,keywords)
-                # once this response is sent back to the user, the frontend must make another call to use these keywords to find jobs over the internet 
-                return response, 201
+                if(response):
+                    jobs = self.get_jobs_from_internet(keywords)
+                    return [jobs,{"message":"Job search successful."}],201
+                else:
+                    return {"error":"Something went wrong."}
 
-            return {"error":"Invalid format."}
+            return {"error":"Something went wrong."}
 
         except Exception as error:
             return {'error': error}
