@@ -2,6 +2,8 @@ from flask import Flask, request, redirect
 from flask_restful import Resource, Api
 from flask_cors import CORS
 
+from scripts.job_scraper import scrape_job_data
+
 class SaveResumeToDatabase(Resource):
     def parse_resume_text(self,resume_text):
         keywords = []
@@ -17,6 +19,8 @@ class SaveResumeToDatabase(Resource):
         
     def get_jobs_from_internet(self,keywords):
         try:
+            keywords = ['javascript', 'reactjs', 'nextjs', 'c++']
+            scrape_job_data(keywords)
             job = {
             "job_id":99141411321,
             "job_portal":'internshala',
