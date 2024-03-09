@@ -19,17 +19,17 @@ class SaveResumeToDatabase(Resource):
         
     def get_jobs_from_internet(self,keywords):
         try:
-            keywords = ['javascript', 'reactjs', 'nextjs', 'c++']
-            scrape_job_data(keywords)
-            job = {
-            "job_id":99141411321,
-            "job_portal":'internshala',
-            "job_link":'url',
-            "job_description":'jdakopskjdks',
-            "job_keywords_ordered":['ruby','js'],
-            "job_posted":'date'
-            }
-            return [job]
+            # dummy_job = {
+            # "job_id":99141411321,
+            # "job_portal":'internshala',
+            # "job_link":'url',
+            # "job_description":'jdakopskjdks',
+            # "job_keywords_ordered":['ruby','js'],
+            # "job_posted":'date'
+            # }
+            keywords = ['javascript']
+            scraped_job_results=scrape_job_data(keywords)
+            return scraped_job_results
     
         except Exception as error:
             return {'error':error}
@@ -44,8 +44,8 @@ class SaveResumeToDatabase(Resource):
                 keywords = self.parse_resume_text(resume_text)
                 response = self.handle_user_data(first_name,last_name,resume_text,keywords)
                 if(response):
-                    jobs = self.get_jobs_from_internet(keywords)
-                    return [jobs,{"message":"Job search successful."}],201
+                    result = self.get_jobs_from_internet(keywords)
+                    return [result,{"message":"Job search successful."}],201
                 else:
                     return {"error":"Something went wrong."}
 
