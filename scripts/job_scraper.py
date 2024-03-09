@@ -8,16 +8,19 @@ def scrape_internshala(keyword, num_pages=1):
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         job_listings = soup.find_all('div', class_='individual_internship')
-
+        
         for job in job_listings:
             try:
                 internship_id = job['id'].split('_')[-1]
-                title = job.find('a', class_='view_detail_button').text.strip()
+                title_tag = job.find('a', class_='view_detail_button')
+                title = title_tag.text.strip()
+                job_link = title_tag['href']
                 company = job.find('div', class_='company').text.strip()
                 location = job.find('a', class_='location_link').text.strip()
                 job_results.append({
                     "id":internship_id,
                     "title":title,
+                    "job_link":f"https://internshala.com/{job_link}",
                     "company":company,
                     "location":location
                 })
@@ -29,7 +32,7 @@ def scrape_job_data(keywords):
     scraped_job_results = []
     for keyword in keywords:
         print(f"Scraping job postings for {keyword}...")
-        response = scrape_internshala(keyword)
+        response = scrape_internshala(keyword,2)
         scraped_job_results.extend(response)
     
     return scraped_job_results

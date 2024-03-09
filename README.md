@@ -10,3 +10,13 @@ Run -
     <li>.venv\Scripts\activate</li>
     <li>pymon app.py</li>
 </ol>
+
+
+### Todo
+<ul>
+    <li>Add text cleaner from raser repository to clean resume and job data</li>
+    <li>Add ML Model</li>
+    <li>Add API calls</li>
+    <li>Remove hard coded values for keywords</li>
+    <li>Push user data to mongodb collection</li>
+</ul>

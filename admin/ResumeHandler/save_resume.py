@@ -27,7 +27,8 @@ class SaveResumeToDatabase(Resource):
             # "job_keywords_ordered":['ruby','js'],
             # "job_posted":'date'
             # }
-            keywords = ['javascript']
+            # hard-coded keywords
+            keywords = ['javascript','python']
             scraped_job_results=scrape_job_data(keywords)
             return scraped_job_results
     
