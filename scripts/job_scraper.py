@@ -2,6 +2,20 @@ import requests
 from bs4 import BeautifulSoup
 from utils import text_cleaner
 
+def scrape_individual_job_internshala(url):
+    try:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        spans = soup.find_all('span', class_='round_tabs')
+        keywords = []
+        for span in spans:
+          text = span.text
+          keywords.append(text.strip())
+        
+        return keywords
+    except Exception as error:
+        print(error)
+
 def scrape_internshala(keyword, num_pages=1):
     job_results = []
     for page in range(1, num_pages+1):
@@ -18,13 +32,14 @@ def scrape_internshala(keyword, num_pages=1):
                 job_link = title_tag['href']
                 company = job.find('div', class_='company').text.strip()
                 location = job.find('a', class_='location_link').text.strip()
+                
                 job_results.append({
                     "id":internship_id,
                     "title":title,
                     "job_link":f"https://internshala.com/{job_link}",
                     "company":text_cleaner.cleanText(company.split(title)[1]).strip(),
                     "location":location,
-                    "keyword":keyword
+                    "keyword":scrape_individual_job_internshala(f"https://internshala.com/{job_link}")
                 })
             except AttributeError as e:
                 print({'error': str(e)})
