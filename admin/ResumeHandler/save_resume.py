@@ -38,12 +38,18 @@ class SaveResumeToDatabase(Resource):
             # "job_posted":'date'
             # }
             # hard-coded keywords
-            keywords = ['javascript', 'python']
+            keywords = ['javascript']
 
             # First check if the jobs are available in the database or not , if not then only scrape the internet
+            data = {
+                'resume_keywords': keywords
+            }
+            response = requests.post(
+                "http://localhost:8080/jobs", json=data)
+            if len(response.json()['Jobs']) > 0:
+                return response.json()
 
             scraped_job_results = scrape_job_data(keywords)
-            return scraped_job_results
             # call the nodejs api to store the jobs data in the database
             for job in scraped_job_results:
                 try:
