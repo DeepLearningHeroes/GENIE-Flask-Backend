@@ -43,7 +43,7 @@ class SaveResumeToDatabase(Resource):
             # First check if the jobs are available in the database or not , if not then only scrape the internet
 
             scraped_job_results = scrape_job_data(keywords)
-
+            return scraped_job_results
             # call the nodejs api to store the jobs data in the database
             for job in scraped_job_results:
                 try:
@@ -54,8 +54,8 @@ class SaveResumeToDatabase(Resource):
                         'job_company': job['company'],
                         'job_location': job['location']
                     }
-                    response = requests.post(
-                        "http://localhost:8080/addJobs", json=data)
+                    # response = requests.post(
+                    #     "http://localhost:8080/addJobs", json=data)
                 except Exception as error:
                     return {"error": error}
             return scraped_job_results

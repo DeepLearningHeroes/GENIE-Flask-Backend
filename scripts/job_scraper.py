@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from utils import text_cleaner
 
 def scrape_internshala(keyword, num_pages=1):
     job_results = []
@@ -21,8 +22,9 @@ def scrape_internshala(keyword, num_pages=1):
                     "id":internship_id,
                     "title":title,
                     "job_link":f"https://internshala.com/{job_link}",
-                    "company":company,
-                    "location":location
+                    "company":text_cleaner.cleanText(company.split(title)[1]).strip(),
+                    "location":location,
+                    "keyword":keyword
                 })
             except AttributeError as e:
                 print({'error': str(e)})
