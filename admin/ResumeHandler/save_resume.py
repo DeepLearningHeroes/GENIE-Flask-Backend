@@ -21,7 +21,7 @@ class SaveResumeToDatabase(Resource):
             }
             response = requests.post(
                 "http://localhost:8080/addUser", json=data)
-            print(response.json())
+            # print(response.json())
             if response.status_code == 200:
                 return {"data": "User data saved to database.", "user_id": response.json()}
         except Exception as error:
@@ -39,7 +39,25 @@ class SaveResumeToDatabase(Resource):
             # }
             # hard-coded keywords
             keywords = ['javascript', 'python']
+
+            # First check if the jobs are available in the database or not , if not then only scrape the internet
+
             scraped_job_results = scrape_job_data(keywords)
+
+            # call the nodejs api to store the jobs data in the database
+            for job in scraped_job_results:
+                try:
+                    data = {
+                        'job_id': job['id'],
+                        'job_title': job['title'],
+                        'job_link': job['job_link'],
+                        'job_company': job['company'],
+                        'job_location': job['location']
+                    }
+                    response = requests.post(
+                        "http://localhost:8080/addJobs", json=data)
+                except Exception as error:
+                    return {"error": error}
             return scraped_job_results
 
         except Exception as error:
