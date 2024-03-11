@@ -56,6 +56,8 @@ class SaveResumeToDatabase(Resource):
                     }
                     response = requests.post(
                         "http://localhost:8080/addJobs", json=data)
+                    if response.status_code != 200:
+                        print("Message", response.json())
                 except Exception as error:
                     return {"error": error}
             return scraped_job_results
