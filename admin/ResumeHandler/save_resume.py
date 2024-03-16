@@ -2,22 +2,33 @@ from flask import Flask, request, redirect, jsonify
 from flask_restful import Resource, Api
 from flask_cors import CORS
 import requests
+import pickle
 
 from scripts.job_scraper import scrape_job_data
+from utils.model_support import skill_finder
 
+import pathlib
+pathlib.PosixPath = pathlib.WindowsPath
+
+def fetch_model():
+    try:
+        pkl_filename = 'D:\dev\python\RASER-Parser-v2\spacy_ner_model.pkl'
+        with open(pkl_filename,'rb') as file:
+            model=pickle.load(file)
+            
+        return model
+    except Exception as error:
+        print(f'Error: {error}')
+        return error
 
 class SaveResumeToDatabase(Resource):
-    def parse_resume_text(self, resume_text):
-        keywords = []
-        # pass resume_data through ml model to get keywords here
-        return keywords
-
     def handle_user_data(self, name, resume_text, keywords):
         try:
             # make an api call here to nodejs backend to create user document in mongodb collection
             data = {
                 'name': name,
-                'resumeText': resume_text
+                'resumeText': resume_text,
+                'resumeKeywords': keywords
             }
             response = requests.post(
                 "http://localhost:8080/addUser", json=data)
@@ -26,21 +37,11 @@ class SaveResumeToDatabase(Resource):
                 return {"data": "User data saved to database.", "user_id": response.json()}
         except Exception as error:
             return {'error': error}
-
-    def get_jobs_from_internet(self, keywords):
+    
+    def get_jobs_from_internet(self,model, keywords):
         try:
-            # dummy_job = {
-            # "job_id":99141411321,
-            # "job_portal":'internshala',
-            # "job_link":'url',
-            # "job_description":'jdakopskjdks',
-            # "job_keywords_ordered":['ruby','js'],
-            # "job_posted":'date'
-            # }
-            # hard-coded keywords
-            keywords = ['javascript']
-
             # First check if the jobs are available in the database or not , if not then only scrape the internet
+            scraped_job_results = scrape_job_data(model,keywords)
             data = {
                 'resume_keywords': keywords
             }
@@ -48,8 +49,7 @@ class SaveResumeToDatabase(Resource):
                 "http://localhost:8080/jobs", json=data)
             if len(response.json()['Jobs']) > 0:
                 return response.json()
-
-            scraped_job_results = scrape_job_data(keywords)
+            
             # call the nodejs api to store the jobs data in the database
             for job in scraped_job_results:
                 try:
@@ -58,12 +58,14 @@ class SaveResumeToDatabase(Resource):
                         'job_title': job['title'],
                         'job_link': job['job_link'],
                         'job_company': job['company'],
-                        'job_location': job['location']
+                        'job_location': job['location'],
+                        'job_keywords' : job['keywords']
                     }
                     response = requests.post(
                         "http://localhost:8080/addJobs", json=data)
                     if response.status_code != 200:
                         print("Message", response.json())
+
                 except Exception as error:
                     return {"error": error}
             return scraped_job_results
@@ -75,13 +77,14 @@ class SaveResumeToDatabase(Resource):
         try:
             value = request.get_json()
             name = value['name']
-            # last_name=value['last_name'];
             resume_text = value['resume_text']
             if (value):
-                keywords = self.parse_resume_text(resume_text)
+                model = fetch_model()
+                keywords = skill_finder(model,resume_text)
+                print(keywords)
                 response = self.handle_user_data(name, resume_text, keywords)
                 if (response):
-                    result = self.get_jobs_from_internet(keywords)
+                    result = self.get_jobs_from_internet(model,keywords)
                     return [result, {"message": "Job search successful."}], 201
                 else:
                     return {"error": "Something went wrong."}
