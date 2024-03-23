@@ -9,6 +9,7 @@ Run -
     <li>pip install -r requirements.txt</li>
     <li>.venv\Scripts\activate</li>
     <li>pymon app.py</li>
+    <li>**If pymon keeps on restarting the server, then use -> python app.py</li>
 </ol>
 
 

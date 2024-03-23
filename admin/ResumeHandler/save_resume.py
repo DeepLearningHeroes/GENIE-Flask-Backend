@@ -3,9 +3,10 @@ from flask_restful import Resource, Api
 from flask_cors import CORS
 import requests
 import pickle
+import spacy
 
 from scripts.job_scraper import scrape_job_data
-from utils.model_support import skill_finder
+from utils.model_support import skill_finder,get_semantically_related_keywords
 
 import pathlib
 pathlib.PosixPath = pathlib.WindowsPath
@@ -20,7 +21,7 @@ def fetch_model():
     except Exception as error:
         print(f'Error: {error}')
         return error
-
+    
 class SaveResumeToDatabase(Resource):
     def handle_user_data(self, name, resume_text, keywords):
         try:
@@ -82,13 +83,16 @@ class SaveResumeToDatabase(Resource):
                 model = fetch_model()
                 keywords = skill_finder(model,resume_text)
                 print(keywords)
-                response = self.handle_user_data(name, resume_text, keywords)
-                if (response):
-                    result = self.get_jobs_from_internet(model,keywords)
-                    return [result, {"message": "Job search successful."}], 201
-                else:
-                    return {"error": "Something went wrong."}
-
+                semantic_keywords = get_semantically_related_keywords(keywords)
+                print(keywords)
+                # response = self.handle_user_data(name, resume_text, keywords)
+                # if (response):
+                #     result = self.get_jobs_from_internet(model,keywords)
+                #     return [result, {"message": "Job search successful."}], 201
+                # else:
+                #     return {"error": "Something went wrong."}
+                return {"keywords":keywords,"semantic_keywords":semantic_keywords}, 201
+            
             return {"error": "Something went wrong."}
 
         except Exception as error:
