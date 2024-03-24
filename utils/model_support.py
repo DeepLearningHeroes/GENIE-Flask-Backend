@@ -1,4 +1,5 @@
 from sense2vec import Sense2Vec
+from utils import text_cleaner
 
 def skill_finder(model,text):
   try:
@@ -23,7 +24,7 @@ def get_final_keywords(keywords,semantic_keywords):
       print(error)
   return keywords
 
-def get_semantically_related_keywords(keywords,similar_terms_per_keyword=10,semantically_related_keywords_count=10):
+def get_semantically_related_keywords(keywords,similar_terms_per_keyword=5,semantically_related_keywords_count=5):
   try:
     keyword_mapping = dict()
     s2v = Sense2Vec().from_disk("D:\dev\python\GENIE-Flask-Backend\GENIE-Flask-Backend\s2v_old")
@@ -56,5 +57,8 @@ def get_semantically_related_keywords(keywords,similar_terms_per_keyword=10,sema
   sorted_keyword_mapping = {k: v for k, v in sorted(keyword_mapping.items(), reverse=True)}
   # remove this comment if u want to restrict the length of keywords returned
   # semantically_related_keywords = list(sorted_keyword_mapping.keys())[0:min(len(sorted_keyword_mapping),semantically_related_keywords_count)]
-  semantically_related_keywords = list(sorted_keyword_mapping.keys())
+  semantically_related_keywords = list(set(sorted_keyword_mapping.keys()))
+  for index in range(len(semantically_related_keywords)):
+    semantically_related_keywords[index] = text_cleaner.cleanText(semantically_related_keywords[index])
+  
   return semantically_related_keywords
