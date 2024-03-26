@@ -59,7 +59,7 @@ def handle_connect():
 
 def fetch_model():
     try:
-        pkl_filename = 'C:\models\spacy_ner_model.pkl'
+        pkl_filename = 'D:\models\spacy_ner_model.pkl'
         with open(pkl_filename, 'rb') as file:
             model = pickle.load(file)
 
@@ -88,16 +88,17 @@ class SaveResumeToDatabase(Resource):
         except Exception as error:
             return {'error': error}
 
-    def get_jobs_from_internet(self, model, keywords):
+    def get_jobs_from_internet(self, model, keywords, isCronJob):
         try:
             # First check if the jobs are available in the database or not , if not then only scrape the internet
             data = {
                 'resume_keywords': keywords
             }
-            response = requests.post(
-                "http://localhost:8080/jobs", json=data)
-            if len(response.json()['Jobs']) > 0:
-                return response.json()
+            if isCronJob == False:
+                response = requests.post(
+                    "http://localhost:8080/jobs", json=data)
+                if len(response.json()['Jobs']) > 0:
+                    return response.json()
 
             scraped_job_results = scrape_job_data(model, keywords)
             print('Jobs scraped!')
@@ -147,7 +148,8 @@ class SaveResumeToDatabase(Resource):
                     keywords = keywords + semantic_keywords
                     socketio.emit('status_update', {
                         'message': 'Getting best jobs across internet for you'}, to=requestSid)
-                    result = self.get_jobs_from_internet(model, keywords)
+                    result = self.get_jobs_from_internet(
+                        model, keywords, False)
                     return result, 201
                 else:
                     return {"error": "Something went wrong."}
@@ -159,9 +161,23 @@ class SaveResumeToDatabase(Resource):
             return {'error': error}
 
 
+class CronJob(Resource):
+    def get(self):
+        try:
+            response = requests.get("http://localhost:8080/keywords")
+            if response.status_code == 200:
+                model = fetch_model()
+                result = self.get_jobs_from_internet(
+                    model, response.json()['keywords'])
+                return result, 201
+        except Exception as error:
+            return {'error': error}
+
+
 api.add_resource(Home, '/')
 api.add_resource(SaveResumeToDatabase,
                  '/admin/save_resume_to_database')
+api.add_resource(CronJob, '/admin/cron')
 
 if __name__ == "__main__":
     # port = int(5000)

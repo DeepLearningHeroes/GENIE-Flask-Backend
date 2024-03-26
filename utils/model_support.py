@@ -30,7 +30,7 @@ def get_final_keywords(keywords, semantic_keywords):
 def get_semantically_related_keywords(keywords, similar_terms_per_keyword=5, semantically_related_keywords_count=5):
     try:
         keyword_mapping = dict()
-        s2v = Sense2Vec().from_disk("C:\models\s2v")
+        s2v = Sense2Vec().from_disk("D:\models\s2v")
         for keyword in keywords:
             try:
                 most_similar = s2v.most_similar(
